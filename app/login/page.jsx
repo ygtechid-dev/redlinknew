@@ -63,13 +63,13 @@ export default function LoginPage() {
 
   // 🔹 LOGIN DUMMY MANUAL
   const handleDummyLogin = () => {
-    if (email === "admin@redlink.id" && password === "123456") {
+    if (email === "admin@redlink.web.id" && password === "123456") {
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("username", "testygtech");
       localStorage.setItem("user_id", "dummy-12345");
       router.push("/dashboard");
     } else {
-      alert("Invalid credentials. Use admin@redlink.id / 123456");
+      alert("Invalid credentials. Use admin@redlink.web.id / 123456");
     }
   };
 

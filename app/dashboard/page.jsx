@@ -217,13 +217,13 @@ Terima kasih telah menggunakan *RedLink Affiliate*. 🚀
                   {profile?.users?.display_name || "RedLink User"}
                 </p>
                 <a
-                  href={`https://redlynk.id/${profile?.username || "#"}`}
+                  href={`https://redlink.web.id/${profile?.username || "#"}`}
                   target="_blank"
                   className={`text-sm ${
                     isPro ? "text-yellow-300" : "text-red-600"
                   } hover:underline break-all`}
                 >
-                  {`https://redlynk.id/${profile?.username || "username"}`}
+                  {`https://redlink.web.id/${profile?.username || "username"}`}
                 </a>
               </div>
             </div>

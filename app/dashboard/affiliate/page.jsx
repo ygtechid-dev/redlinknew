@@ -93,7 +93,7 @@ export default function AffiliateDashboard() {
     }
   };
 
-  const affiliateLink = `https://redlink.id/${username}?ref=${username}`;
+  const affiliateLink = `https://redlink.web.id/${username}?ref=${username}`;
   const copyLink = async () => {
     await navigator.clipboard.writeText(affiliateLink);
     setCopied(true);
@@ -236,7 +236,7 @@ export default function AffiliateDashboard() {
                       <p className="text-xs text-gray-500 mt-1">
                         Link:{" "}
                         <span className="text-blue-600 break-all">
-                          https://redlink.id/{username}?product={a.product_id}
+                          https://redlink.web.id/{username}?product={a.product_id}
                           &ref={a.affiliate_username}
                         </span>
                       </p>

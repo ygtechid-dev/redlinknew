@@ -202,7 +202,7 @@ export default function MyRedLinkPage() {
                 <div>
                   <p className="text-sm text-gray-500 mb-1">My Redlink:</p>
                   <p className="text-lg font-semibold text-gray-800">
-                    https://redlink.id/{profile.username}
+                    https://redlink.web.id/{profile.username}
                   </p>
                 </div>
                 <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm font-medium text-gray-700">
