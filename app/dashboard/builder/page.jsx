@@ -1,8 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { webinyClient } from "@/lib/webiny-client";
-import WebinyEditorModal from "@/components/WebinyEditorModal";
+import BuilderEditorModal from "@/components/BuilderEditorModal";
 import {
   Globe,
   Plus,
@@ -16,18 +15,31 @@ import {
   CheckCircle2,
   Clock,
   ExternalLink,
+  Copy,
 } from "lucide-react";
 
+interface Page {
+  id: string;
+  username: string;
+  page_name: string;
+  page_slug: string;
+  page_data: any;
+  status: 'draft' | 'published';
+  created_at: string;
+  updated_at: string;
+  published_at?: string;
+}
+
 export default function RedlinkWebBuilderLanding() {
-  const [username, setUsername] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [pages, setPages] = useState([]);
+  const [username, setUsername] = useState<string | null>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [pages, setPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [projectName, setProjectName] = useState("");
   
-  // 🆕 State untuk iframe modal
-  const [selectedPage, setSelectedPage] = useState(null);
+  // State untuk editor modal
+  const [selectedPage, setSelectedPage] = useState<Page | null>(null);
   const [showEditor, setShowEditor] = useState(false);
 
   // Page limits
@@ -45,8 +57,8 @@ export default function RedlinkWebBuilderLanding() {
     fetchData(u);
   }, []);
 
-  // ✅ Ambil profile dan pages
-  const fetchData = async (u) => {
+  // Ambil profile dan pages
+  const fetchData = async (u: string) => {
     setLoading(true);
     try {
       // Get profile
@@ -59,7 +71,7 @@ export default function RedlinkWebBuilderLanding() {
 
       // Get pages dari database
       const { data: pagesData, error } = await supabase
-        .from("webiny_pages")
+        .from("builder_pages")
         .select("*")
         .eq("username", u)
         .order("created_at", { ascending: false });
@@ -73,7 +85,7 @@ export default function RedlinkWebBuilderLanding() {
     }
   };
 
-  // ✅ Buat landing page baru via Webiny API
+  // Buat landing page baru
   const createNewLandingPage = async () => {
     if (!username) return alert("Username belum ditemukan.");
     if (!projectName.trim()) return alert("Isi nama project dulu.");
@@ -87,36 +99,23 @@ export default function RedlinkWebBuilderLanding() {
 
     setCreating(true);
     try {
-      // 1. Create page via Webiny API
-      const result = await webinyClient.createPage(
-        projectName.trim(),
-        username
-      );
+      // Generate slug dari nama
+      const slug = projectName
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
 
-      if (result.error) {
-        throw new Error(result.error.message);
-      }
-
-      const pageData = result.data;
-
-      // 2. Generate editor URL
-      const editorUrl = await webinyClient.getEditorUrl(
-        pageData.id,
-        username
-      );
-
-      // 3. Save to database
+      // Save to database
       const { data: newPage, error: dbError } = await supabase
-        .from("webiny_pages")
+        .from("builder_pages")
         .insert([
           {
             username,
-            page_id: pageData.id,
-            page_pid: pageData.pid,
-            page_title: pageData.title,
-            page_url: pageData.url,
-            editor_url: editorUrl,
-            status: pageData.status,
+            page_name: projectName.trim(),
+            page_slug: `${username}-${slug}`,
+            page_data: { elements: [] }, // Empty page
+            status: 'draft',
           },
         ])
         .select()
@@ -129,10 +128,10 @@ export default function RedlinkWebBuilderLanding() {
       
       alert(`✅ Landing page '${projectName}' berhasil dibuat!`);
 
-      // 🆕 Auto-open editor in modal
+      // Auto-open editor in modal
       setSelectedPage(newPage);
       setShowEditor(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error("❌ Gagal membuat landing page:", err);
       alert(`Gagal membuat landing page: ${err.message}`);
     } finally {
@@ -140,76 +139,118 @@ export default function RedlinkWebBuilderLanding() {
     }
   };
 
-  // 🆕 Open editor in iframe modal
-  const openEditor = (page) => {
+  // Open editor in modal
+  const openEditor = (page: Page) => {
     setSelectedPage(page);
     setShowEditor(true);
   };
 
-  // 🆕 Close editor modal
+  // Close editor modal
   const closeEditor = () => {
     setShowEditor(false);
     setSelectedPage(null);
     // Refresh data setelah close
-    fetchData(username);
+    if (username) fetchData(username);
   };
 
-  // 🆕 Handle save from iframe
-  const handleEditorSave = async (data) => {
-    console.log("💾 Page saved from iframe:", data);
-    // Update local state jika perlu
-    await fetchData(username);
+  // Handle save from modal
+  const handleEditorSave = async (pageData: any) => {
+    console.log("💾 Page saved:", pageData);
+    // Refresh data
+    if (username) await fetchData(username);
   };
 
-  // ✅ Publish page
-  const handlePublishPage = async (page) => {
+  // Publish page
+  const handlePublishPage = async (page: Page) => {
     try {
-      const result = await webinyClient.publishPage(page.page_id);
-
-      if (result.error) {
-        throw new Error(result.error.message);
-      }
-
       // Update database
-      await supabase
-        .from("webiny_pages")
+      const { error } = await supabase
+        .from("builder_pages")
         .update({
           status: "published",
-          page_url: result.data.url,
           published_at: new Date().toISOString(),
         })
         .eq("id", page.id);
 
+      if (error) throw error;
+
       // Refresh data
-      fetchData(username);
+      if (username) fetchData(username);
       
       alert("✅ Landing page berhasil dipublish!");
-    } catch (err) {
+    } catch (err: any) {
       console.error("❌ Gagal publish:", err);
       alert(`Gagal publish: ${err.message}`);
     }
   };
 
-  // ✅ Delete page
-  const handleDeletePage = async (page) => {
+  // Delete page
+  const handleDeletePage = async (page: Page) => {
     const confirm = window.confirm(
-      `Yakin mau hapus landing page "${page.page_title}"?`
+      `Yakin mau hapus landing page "${page.page_name}"?`
     );
     if (!confirm) return;
 
     try {
-      // Delete from Webiny
-      await webinyClient.deletePage(page.page_id);
-
       // Delete from database
-      await supabase.from("webiny_pages").delete().eq("id", page.id);
+      const { error } = await supabase
+        .from("builder_pages")
+        .delete()
+        .eq("id", page.id);
+
+      if (error) throw error;
 
       setPages((prev) => prev.filter((p) => p.id !== page.id));
       alert("✅ Landing page berhasil dihapus!");
-    } catch (err) {
+    } catch (err: any) {
       console.error("❌ Gagal hapus:", err);
       alert(`Gagal hapus: ${err.message}`);
     }
+  };
+
+  // Duplicate page
+  const handleDuplicatePage = async (page: Page) => {
+    if (!canCreateMore) {
+      return alert(
+        `❌ Limit tercapai!\n\nAkun Free hanya bisa membuat ${FREE_LIMIT} landing pages.`
+      );
+    }
+
+    try {
+      const { data: newPage, error } = await supabase
+        .from("builder_pages")
+        .insert([
+          {
+            username: page.username,
+            page_name: `${page.page_name} (Copy)`,
+            page_slug: `${page.page_slug}-copy-${Date.now()}`,
+            page_data: page.page_data,
+            status: 'draft',
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setPages((prev) => [newPage, ...prev]);
+      alert("✅ Landing page berhasil diduplikasi!");
+    } catch (err: any) {
+      console.error("❌ Gagal duplikasi:", err);
+      alert(`Gagal duplikasi: ${err.message}`);
+    }
+  };
+
+  // Get preview URL
+  const getPreviewUrl = (page: Page) => {
+    return `${window.location.origin}/preview/${page.page_slug}`;
+  };
+
+  // Copy preview URL
+  const copyPreviewUrl = (page: Page) => {
+    const url = getPreviewUrl(page);
+    navigator.clipboard.writeText(url);
+    alert("✅ URL berhasil dicopy!");
   };
 
   // ========================== UI ==========================
@@ -240,7 +281,7 @@ export default function RedlinkWebBuilderLanding() {
                 Landing Page Builder
               </h1>
               <p className="text-gray-600 text-sm mt-1">
-                Powered by Webiny CMS
+                Drag & Drop Visual Builder
               </p>
             </div>
             <div className="text-right">
@@ -310,6 +351,11 @@ export default function RedlinkWebBuilderLanding() {
                 placeholder="Masukkan nama project (contoh: Promo Ramadan)"
                 className="flex-1 border rounded-lg px-4 py-2 text-sm"
                 disabled={!canCreateMore}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !creating && canCreateMore) {
+                    createNewLandingPage();
+                  }
+                }}
               />
               <button
                 onClick={createNewLandingPage}
@@ -356,7 +402,7 @@ export default function RedlinkWebBuilderLanding() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="font-bold text-gray-800 text-lg">
-                          {page.page_title}
+                          {page.page_name}
                         </h3>
                         {page.status === "published" ? (
                           <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-semibold flex items-center gap-1">
@@ -372,20 +418,23 @@ export default function RedlinkWebBuilderLanding() {
                         Created:{" "}
                         {new Date(page.created_at).toLocaleDateString("id-ID")}
                       </p>
-                      {page.page_url && (
-                        <a
-                          href={page.page_url}
-                          target="_blank"
-                          className="text-xs text-blue-600 hover:underline break-all"
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-400">
+                          /{page.page_slug}
+                        </span>
+                        <button
+                          onClick={() => copyPreviewUrl(page)}
+                          className="text-blue-600 hover:text-blue-700"
+                          title="Copy preview URL"
                         >
-                          {page.page_url}
-                        </a>
-                      )}
+                          <Copy className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
 
                     {/* Actions */}
                     <div className="flex flex-wrap gap-2">
-                      {/* 🆕 Edit in Modal */}
+                      {/* Edit in Modal */}
                       <button
                         onClick={() => openEditor(page)}
                         className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition flex items-center gap-1"
@@ -393,15 +442,14 @@ export default function RedlinkWebBuilderLanding() {
                         <Edit className="w-4 h-4" /> Edit
                       </button>
 
-                      {/* Open in New Tab */}
-                      <a
-                        href={page.editor_url}
-                        target="_blank"
+                      {/* Duplicate */}
+                      <button
+                        onClick={() => handleDuplicatePage(page)}
                         className="bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition flex items-center gap-1"
-                        title="Open in new tab"
+                        title="Duplicate page"
                       >
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
+                        <Copy className="w-4 h-4" />
+                      </button>
 
                       {page.status === "draft" && (
                         <button
@@ -412,9 +460,9 @@ export default function RedlinkWebBuilderLanding() {
                         </button>
                       )}
 
-                      {page.status === "published" && page.page_url && (
+                      {page.status === "published" && (
                         <a
-                          href={page.page_url}
+                          href={getPreviewUrl(page)}
                           target="_blank"
                           className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition flex items-center gap-1"
                         >
@@ -437,9 +485,9 @@ export default function RedlinkWebBuilderLanding() {
         </div>
       </div>
 
-      {/* 🆕 Webiny Editor Modal */}
+      {/* Builder Editor Modal */}
       {showEditor && selectedPage && (
-        <WebinyEditorModal
+        <BuilderEditorModal
           page={selectedPage}
           onClose={closeEditor}
           onSave={handleEditorSave}
