@@ -1,6 +1,4 @@
-// 📁 app/builder/page.tsx
-// Editor untuk edit landing page
-
+import { Suspense } from "react";
 import BuilderPage from "@/components/BuilderPage";
 
 export const metadata = {
@@ -9,5 +7,9 @@ export const metadata = {
 };
 
 export default function BuilderEditorPage() {
-  return <BuilderPage />;
+  return (
+    <Suspense fallback={<div className="text-white p-10">Loading...</div>}>
+      <BuilderPage />
+    </Suspense>
+  );
 }
