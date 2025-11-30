@@ -24,8 +24,8 @@ export default function PayRedLinkSSO() {
       }
 
       // Build URL dengan query params
-    //   const payUrl = new URL("https://pay.redlink.id/app");
-      const payUrl = new URL("http://localhost:3001/app");
+      const payUrl = new URL("https://pay.redlink.web.id/app");
+      // const payUrl = new URL("http://localhost:3001/app");
 
       payUrl.searchParams.set("username", username);
       payUrl.searchParams.set("user_id", userId);
