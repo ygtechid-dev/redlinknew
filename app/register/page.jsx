@@ -156,7 +156,7 @@ export default function RegisterPage() {
             </label>
             <div className="flex items-center">
               <span className="bg-gray-100 px-3 py-3 rounded-l-lg border border-r-0 border-gray-300 text-gray-600">
-                redlink.web.id/
+                redlink.id/
               </span>
               <input
                 type="text"

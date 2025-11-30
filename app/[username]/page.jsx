@@ -92,7 +92,7 @@ export default function UserPage() {
           method: "QRIS",
           amount: block.price,
           name: block.title,
-          email: "buyer@redlink.web.id",
+          email: "buyer@redlink.id",
           phone: profile?.phone || "08123456789",
           orderId,
         }),
@@ -163,7 +163,7 @@ export default function UserPage() {
 🧾 Ref: ${orderId}
 
 Berikut link produk digital kamu:
-🔗 ${block.description || "https://redlink.web.id/download/" + orderId}
+🔗 ${block.description || "https://redlink.id/download/" + orderId}
 
 ⚠️ *Syarat & Ketentuan:*
 Link ini bersifat pribadi dan *tidak boleh disebarluaskan atau dijual kembali.*

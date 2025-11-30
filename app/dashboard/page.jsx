@@ -12,6 +12,9 @@ import {
 } from "recharts";
 import { createClient } from "@supabase/supabase-js";
 import UpgradeToProModal from "../../components/UpgradeToProModal";
+import PayRedLinkSSO from "@/components/PayRedLinkSSO";
+
+
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -88,7 +91,7 @@ export default function DashboardHome() {
             .maybeSingle();
 
           if (balanceError) throw balanceError;
-          setBalance(balanceData?.current_balance || 250000);
+          setBalance(balanceData?.current_balance || 0);
         }
 
         // Dummy chart
@@ -250,14 +253,14 @@ Terima kasih telah menggunakan *RedLink Affiliate*. 🚀
                 </p>
                 
                <a
-  href={`https://redlink.web.id/${profile?.username || "#"}`}
+  href={`https://redlink.id/${profile?.username || "#"}`}
   target="_blank"
   rel="noopener noreferrer"
   className={`text-sm ${
     isPro ? "text-yellow-300" : "text-red-600"
   } hover:underline break-all`}
 >
-  {`https://redlink.web.id/${profile?.username || "username"}`}
+  {`https://redlink.id/${profile?.username || "username"}`}
 </a>
 
               </div>
@@ -366,6 +369,7 @@ Terima kasih telah menggunakan *RedLink Affiliate*. 🚀
         </div>
       </div>
 
+<PayRedLinkSSO />
       {/* Chart Section */}
       <div
         className={`mt-6 p-4 sm:p-6 rounded-2xl shadow-md ${

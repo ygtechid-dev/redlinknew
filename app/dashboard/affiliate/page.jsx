@@ -169,8 +169,8 @@ export default function AffiliateDashboard() {
     }
   };
 
-  // ✅ Link affiliate diarahkan ke homepage redlink.web.id dengan ref parameter
-  const affiliateLink = `https://redlink.web.id?ref=${username}`;
+  // ✅ Link affiliate diarahkan ke homepage redlink.id dengan ref parameter
+  const affiliateLink = `https://redlink.id?ref=${username}`;
   
   const copyLink = async () => {
     await navigator.clipboard.writeText(affiliateLink);
@@ -539,7 +539,7 @@ export default function AffiliateDashboard() {
                         <p className="text-xs text-gray-500 mt-1">
                           Link:{" "}
                           <span className="text-blue-600 break-all">
-                            https://redlink.web.id?product={a.product_id}&ref={a.affiliate_username}
+                            https://redlink.id?product={a.product_id}&ref={a.affiliate_username}
                           </span>
                         </p>
                         <p className="text-xs text-gray-400 mt-1">

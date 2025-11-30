@@ -33,7 +33,7 @@ export default function UpgradeToProModal({ isOpen, onClose, profile }) {
           method: "QRIS",
           amount: amountValue,
           name: profile?.users?.display_name || "RedLink User",
-          email: profile?.users?.email || "user@redlink.web.id",
+          email: profile?.users?.email || "user@redlink.id",
           phone: profile?.phone || "08123456789",
           orderId: orderIdValue,
           user_id: profile?.id,

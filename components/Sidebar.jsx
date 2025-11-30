@@ -157,7 +157,7 @@ export default function Sidebar() {
       {/* Elementor RedLink (Bottom Section) */}
       <div className="relative z-10 mt-auto border-t border-white/20 pt-4">
         <button 
-         onClick={() => router.push('/dashboard/builder')} 
+         onClick={() => router.push('/web-builder')} 
          className="flex items-center gap-3 py-2 px-3 rounded-lg text-sm font-semibold bg-white/15 hover:bg-white/25 text-white w-full transition-all duration-200">
           <Layers size={18} />
           Elementor RedLink
