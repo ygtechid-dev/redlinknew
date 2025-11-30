@@ -1,22 +1,20 @@
 "use client";
-import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import BuilderEditorModal from "@/components/BuilderEditorModal";
 import {
-  Globe,
-  Plus,
-  Edit,
-  Trash2,
-  Eye,
-  Loader2,
-  Sparkles,
-  Lock,
-  Crown,
   CheckCircle2,
   Clock,
-  ExternalLink,
   Copy,
+  Crown,
+  Edit,
+  Eye,
+  Globe,
+  Loader2,
+  Lock,
+  Plus,
+  Sparkles,
+  Trash2
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface Page {
   id: string;
@@ -486,13 +484,13 @@ export default function RedlinkWebBuilderLanding() {
       </div>
 
       {/* Builder Editor Modal */}
-      {showEditor && selectedPage && (
+      {/* {showEditor && selectedPage && (
         <BuilderEditorModal
           page={selectedPage}
           onClose={closeEditor}
           onSave={handleEditorSave}
         />
-      )}
+      )} */}
     </>
   );
 }
