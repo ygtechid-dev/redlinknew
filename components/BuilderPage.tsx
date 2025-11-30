@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, CSSProperties} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+
 import {
   Save,
   X,
@@ -376,7 +377,7 @@ export default function BuilderPage() {
                         ? "ring-2 ring-red-500"
                         : "hover:ring-2 hover:ring-red-300"
                     }`}
-                    style={element.styles}
+                    style={element.styles as CSSProperties}
                   >
                     {element.type === "image" ? (
                       <img src={element.content} alt="Element" className="w-full" />
