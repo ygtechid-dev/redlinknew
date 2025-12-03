@@ -278,7 +278,6 @@ export default function AffiliateDashboard() {
               </h3>
               <p className="text-sm text-gray-500">
                 Share this link and earn{" "}
-                <span className="font-bold text-red-600">30%</span> for Free signups and{" "}
                 <span className="font-bold text-green-600">50%</span> for Pro upgrades!
               </p>
             </div>
