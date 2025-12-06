@@ -18,7 +18,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { createClient } from "@supabase/supabase-js";
-import UpgradeToProModal from "../../components/UpgradeToProModal";
+import UpgradeToProModal from "../components/UpgradeToProModal";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
